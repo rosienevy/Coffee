@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dedica Coffee Helper</title>
+<style>
+:root{--bg:#faf6f1;--card:#fff;--text:#2b1d14;--muted:#7a6a5e;--accent:#8a4b22;--chip:#f0e7dd;--line:#e4d8cb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1410;--card:#281e18;--text:#f3e9df;--muted:#b3a292;--accent:#e0925a;--chip:#3a2c23;--line:#4a3a2f}}
+:root[data-theme="dark"]{--bg:#1c1410;--card:#281e18;--text:#f3e9df;--muted:#b3a292;--accent:#e0925a;--chip:#3a2c23;--line:#4a3a2f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 Georgia,'Times New Roman',serif}
+main{max-width:640px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:26px;margin:0 0 4px}
+p.sub{color:var(--muted);margin:0 0 20px;font-family:system-ui,sans-serif;font-size:14px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;font-family:system-ui,sans-serif}
+h2{font-family:Georgia,serif;font-size:18px;margin:0 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--chip);color:var(--text);padding:8px 12px;border-radius:999px;font-size:14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 4px}
+select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:15px}
+button.go{width:100%;padding:14px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-size:16px;font-weight:600;cursor:pointer}
+.tip{border-left:4px solid var(--accent);padding:4px 0 4px 12px;margin:14px 0}
+.tip b{display:block;font-family:Georgia,serif;font-size:16px}
+.tip span{font-size:14px;color:var(--muted)}
+.tag{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent)}
+.empty{color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>☕ Dedica Helper</h1>
+<p class="sub">Tell me what's wrong with your shot and I'll suggest what to change.</p>
+
+<section>
+<h2>What's the problem?</h2>
+<div class="chips" id="symptoms"></div>
+</section>
+
+<section>
+<h2>Your setup</h2>
+<label>Water</label>
+<select id="water"><option value="">Not sure</option><option value="soft">Soft</option><option value="medium">Medium</option><option value="hard">Hard / limescale area</option></select>
+<label>Basket</label>
+<select id="basket"><option value="">Not sure</option><option value="press">Pressurised (dual-wall, tiny hole)</option><option value="non">Non-pressurised (single-wall)</option></select>
+<label>Coffee</label>
+<select id="grind"><option value="">Not sure</option><option value="pre">Pre-ground</option><option value="fresh">Freshly ground at home</option></select>
+<label>Roast</label>
+<select id="roast"><option value="">Not sure</option><option value="light">Light</option><option value="medium">Medium</option><option value="dark">Dark</option></select>
+<label>Shot time (start to finish)</label>
+<select id="time"><option value="">Haven't timed it</option><option value="fast">Under 20 sec</option><option value="ok">20–30 sec</option><option value="slow">Over 30 sec</option></select>
+<label>Last descaled</label>
+<select id="descale"><option value="">Not sure / never</option><option value="recent">Within 1 month</option><option value="mid">1–3 months ago</option><option value="old">Over 3 months ago</option></select>
+</section>
+
+<button class="go" id="go">Get suggestions</button>
+<div id="out" style="margin-top:16px"></div>
+</main>
+
+<script>
+const SYMPTOMS={bitter:"Bitter",sour:"Sour / sharp",weak:"Weak / watery",burnt:"Burnt taste",fast:"Runs too fast",slow:"Slow / dribbling",crema:"Little or no crema",cool:"Lukewarm",spray:"Spraying / uneven",gritty:"Gritty / muddy",flat:"Flat / dull"};
+const sel=new Set();
+const wrap=document.getElementById('symptoms');
+for(const k in SYMPTOMS){const b=document.createElement('button');b.className='chip';b.textContent=SYMPTOMS[k];b.setAttribute('aria-pressed','false');
+b.onclick=()=>{sel.has(k)?sel.delete(k):sel.add(k);b.setAttribute('aria-pressed',sel.has(k))};wrap.appendChild(b)}
+
+const T={
+grindFiner:["Grind finer","Go one step finer at a time. Dedicas need a fine, espresso grind; coarse coffee runs through fast and tastes thin or sour."],
+grindCoarser:["Grind a touch coarser","Go one step coarser. Too-fine coffee over-extracts (bitter) and can choke the machine."],
+tamp:["Tamp firmly and level","Fill the basket, level it off, then press down with about 15 kg of force (like pressing a bathroom scale to that reading) and keep the tamp flat. Uneven tamping causes channeling: water finds a gap and rushes through."],
+tampLight:["Ease off the tamp","Over-tamping, or tamping a full pile of coffee, can choke the shot. Level the dose and press firmly but not with your full weight."],
+dose:["Check your dose","Fill the basket level with no heaping. Too little coffee makes weak, fast shots; too much makes slow, bitter ones."],
+descale:["Descale now","Limescale narrows the water path and drops brew temperature and pressure. In hard water areas, descale about every 1–2 months, following De'Longhi's instructions."],
+filter:["Use filtered or softer water","Try a Brita-type jug or bottled low-mineral water. Hard water builds scale fast and can make coffee taste flat or bitter."],
+preheat:["Pre-heat everything","Run a blank shot of hot water through the empty portafilter and into your cup before brewing. The Dedica runs on the cool side, so warm metal and a warm cup help a lot."],
+hotwater:["Warm up the machine first","Let it heat fully (steady lights), and briefly run steam or hot water before brewing to bring the thermoblock up to temperature."],
+fresh:["Use fresher coffee","Beans older than about 4–6 weeks after roasting lose crema and flavour. Pre-ground coffee goes stale within days of opening."],
+pressBasket:["Pressurised baskets are forgiving","Pressurised baskets mask grind and tamp mistakes and produce crema artificially, so they tolerate coarser coffee. Use pre-ground 'espresso' coffee and don't over-tamp."],
+lighter:["Try a medium roast","Dark roasts are naturally bitter and burnt-tasting, especially at the Dedica's temperature. A medium roast is easier to get sweet."],
+darker:["Try a medium or medium-dark roast","Light roasts need hotter water and finer grinding than the Dedica easily gives. Sourness is common; a medium roast is more forgiving."],
+clean:["Clean the portafilter and basket","Old oils build up and go rancid, giving bitter or muddy flavours. Rinse the basket, and backflush/clean the group head as per the manual."],
+shower:["Clean the shower screen","Coffee grounds and scale on the group head screen cause spraying and uneven flow. Wipe it and check the holes."],
+dist:["Distribute grounds evenly","Tap the basket lightly and level the surface with a finger before tamping to avoid pockets and channeling."],
+volume:["Stop the shot earlier","Long shots drag out bitter, watery flavours. Stop around 30–40 ml per shot."],
+};
+const $=id=>document.getElementById(id).value;
+document.getElementById('go').onclick=()=>{
+const s={};const add=(k,w)=>s[k]=(s[k]||0)+w;
+const water=$('water'),basket=$('basket'),grind=$('grind'),roast=$('roast'),time=$('time'),desc=$('descale');
+if(time==='fast'){add('grindFiner',4);add('tamp',2);add('dose',2)}
+if(time==='slow'){add('grindCoarser',4);add('tampLight',2);add('dose',1)}
+if(sel.has('bitter')){add('grindCoarser',3);add('volume',2);add('clean',2);add('preheat',1);if(roast==='dark')add('lighter',3);if(water==='hard')add('filter',2);if(desc==='old'||desc==='')add('descale',1)}
+if(sel.has('burnt')){add('lighter',3);add('clean',2);add('grindCoarser',2)}
+if(sel.has('sour')){add('grindFiner',3);add('preheat',3);add('hotwater',2);add('tamp',1);if(roast==='light')add('darker',3)}
+if(sel.has('weak')){add('grindFiner',3);add('dose',3);add('tamp',2);add('volume',2);add('fresh',1)}
+if(sel.has('fast')){add('grindFiner',4);add('tamp',3);add('dose',2)}
+if(sel.has('slow')){add('grindCoarser',4);add('tampLight',3);add('dose',1);add('shower',1)}
+if(sel.has('crema')){add('fresh',4);add('grindFiner',2);add('tamp',2);if(basket==='press')add('pressBasket',1);if(roast==='light')add('darker',1)}
+if(sel.has('cool')){add('preheat',4);add('hotwater',3);if(desc==='old'||water==='hard')add('descale',3)}
+if(sel.has('spray')){add('tamp',4);add('dist',3);add('shower',3);add('dose',1)}
+if(sel.has('gritty')){add('clean',3);add('grindCoarser',2);add('shower',1)}
+if(sel.has('flat')){add('fresh',3);add('preheat',2);if(water==='hard')add('filter',3);if(desc!=='recent')add('descale',2)}
+if(water==='hard'&&sel.size){add('filter',1);if(desc==='old'||desc==='')add('descale',2)}
+if(desc==='old'&&water==='hard')add('descale',2);
+if(grind==='pre')add('fresh',1);
+if(basket==='press'&&grind==='fresh'){s.grindFiner=(s.grindFiner||0);add('pressBasket',1)}
+const list=Object.entries(s).filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,6);
+const out=document.getElementById('out');
+if(!sel.size&&!time){out.innerHTML='<section><p class="empty">Pick at least one problem or set your shot time, then try again.</p></section>';return}
+out.innerHTML='<section><h2>Try these, in order</h2>'+list.map(([k],i)=>`<div class="tip"><span class="tag">${i===0?'Start here':'Then'}</span><b>${T[k][0]}</b><span>${T[k][1]}</span></div>`).join('')+'<p class="empty">Change one thing at a time so you can tell what worked.</p></section>';
+out.scrollIntoView({behavior:'smooth'});
+};
+</script>
+</body>
+</html>
