@@ -142,9 +142,9 @@ let size='double';const done=new Set();
 function stepsData(){
  const dose=size==='single'?'about 7 g':'about 14 g';
  return [
- ['Check the water',"Fill the tank with fresh water (filtered if you are in a hard water area). Make sure it is well above MIN, ideally up to MAX, and pushed firmly into place. Check the steam dial is closed (at 0)."],
- ['Switch on and wait',"Press the power button. The lights flash while the machine heats up. When the two coffee button lights stay solid, it is ready. This takes under a minute."],
- ['Run a blank shot',"Put the empty portafilter in place with a cup underneath and press the coffee button. Let the hot water run through into the cup. This warms the portafilter and the cup, which matters because the Dedica runs cool. Tip the water away."],
+ ['Check the water',"Fill the tank with fresh water (filtered ideally if in hard water area). Make sure it is well above MIN and check the steam dial is closed (at 0 / 9 o'clock)."],
+ ['Switch on and wait',"Press the power button (on the bottom right side of the machine near the back edge). The lights flash while the machine heats up. When the two coffee button lights stay solid, it is ready. This takes under a minute."],
+ ['Run a blank shot',"Put the empty portafilter in place with a cup underneath and press the coffee button. Let the hot water run through into the mug you'll use. This warms the portafilter and the mug. Tip the water away."],
  ['Dry the basket',"Wipe the basket and portafilter dry with a clean cloth. Wet grounds clump and cause uneven flow."],
  ['Add the coffee',"Add "+dose+" of ground coffee for a "+size+" shot. Fill the basket level with the rim and do not heap it. A kitchen scale helps until you can judge it by eye."],
  ['Level and tamp',"Gently tap and level the surface, then tamp down firmly and evenly (about 15 kg of pressure). Keep the tamper flat. Brush any stray grounds off the rim."],
@@ -172,6 +172,7 @@ document.getElementById('tab-lights').innerHTML='<section><h2>What the lights me
 '<tr><td>All lights flashing</td><td>Something needs attention. Check the tank has water and is seated, the steam dial is closed, and the portafilter is fitted. Switch off and on again. If it keeps flashing, contact De\'Longhi.</td></tr>'+
 '</table><p class="empty">Light patterns can vary slightly between models, so check your manual if unsure.</p></section>'+
 '<section><h2>How to descale</h2><p class="empty">Use De\'Longhi descaler (or a suitable one), with the tank filled as instructed. The machine runs a programme, and afterwards you rinse the tank and run clean water through until it is finished. In a hard water area, aim to descale every 1 to 2 months. The video shows the full process.</p><a class="btn" href="https://www.youtube.com/watch?v=t-AjNGFF16M" target="_blank" rel="noopener">Watch the descaling video</a></section>';
+ +'<section><h2>Manual</h2><a class="btn" href="dedica-manual.pdf" target="_blank" rel="noopener">Open the Dedica manual (PDF)</a></section>';
 
 showTab('fix');
 </script>
